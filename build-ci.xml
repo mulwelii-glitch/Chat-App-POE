@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Stand-alone Ant build used ONLY by GitHub Actions. It does not touch NetBeans' own build.xml. -->
+<project name="QuickChat-CI" default="test" basedir=".">
+    <property name="classes.dir" value="build-ci/classes"/>
+    <property name="test.classes.dir" value="build-ci/test-classes"/>
+
+    <path id="junit.libs">
+        <pathelement location="lib/junit-4.13.2.jar"/>
+        <pathelement location="lib/hamcrest-core-1.3.jar"/>
+    </path>
+
+    <target name="clean">
+        <delete dir="build-ci"/>
+    </target>
+
+    <target name="compile" depends="clean">
+        <mkdir dir="${classes.dir}"/>
+        <mkdir dir="${test.classes.dir}"/>
+        <javac srcdir="src" destdir="${classes.dir}" includeantruntime="false" encoding="UTF-8"/>
+        <javac srcdir="test" destdir="${test.classes.dir}" includeantruntime="false" encoding="UTF-8">
+            <classpath>
+                <pathelement location="${classes.dir}"/>
+                <path refid="junit.libs"/>
+            </classpath>
+        </javac>
+    </target>
+
+    <!-- Runs every test class; the build fails if any test fails. -->
+    <target name="test" depends="compile">
+        <java classname="org.junit.runner.JUnitCore" fork="true" failonerror="true">
+            <classpath>
+                <pathelement location="${classes.dir}"/>
+                <pathelement location="${test.classes.dir}"/>
+                <path refid="junit.libs"/>
+            </classpath>
+            <arg value="chatapp.LoginTest"/>
+            <arg value="chatapp.MessageTest"/>
+            <arg value="chatapp.MessageManagerTest"/>
+        </java>
+    </target>
+</project>
