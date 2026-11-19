@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Stand-alone Ant build used ONLY by GitHub Actions. It does not touch NetBeans' own build.xml. -->
+<!-- Stand-alone Ant build used ONLY by GitHub Actions.
+     This version expects all .java files at the top level of the repository. -->
 <project name="QuickChat-CI" default="test" basedir=".">
     <property name="classes.dir" value="build-ci/classes"/>
     <property name="test.classes.dir" value="build-ci/test-classes"/>
@@ -16,8 +17,16 @@
     <target name="compile" depends="clean">
         <mkdir dir="${classes.dir}"/>
         <mkdir dir="${test.classes.dir}"/>
-        <javac srcdir="src" destdir="${classes.dir}" includeantruntime="false" encoding="UTF-8"/>
-        <javac srcdir="test" destdir="${test.classes.dir}" includeantruntime="false" encoding="UTF-8">
+
+        <!-- Application classes: every .java file except the test classes -->
+        <javac srcdir="." destdir="${classes.dir}" includeantruntime="false" encoding="UTF-8">
+            <include name="*.java"/>
+            <exclude name="*Test.java"/>
+        </javac>
+
+        <!-- Test classes: every file ending in Test.java -->
+        <javac srcdir="." destdir="${test.classes.dir}" includeantruntime="false" encoding="UTF-8">
+            <include name="*Test.java"/>
             <classpath>
                 <pathelement location="${classes.dir}"/>
                 <path refid="junit.libs"/>
